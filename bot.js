@@ -7,6 +7,11 @@
 
 // import the discord.js module
 const Discord = require('discord.js');
+var express = require('express');
+var fs = require('fs');
+var request = require('request');
+var cheerio = require('cheerio');
+var app = express();
 
 var startTime;
 var endTime;
@@ -21,6 +26,42 @@ var days = 0;
 // create an instance of a Discord Client, and call it bot
 const client = new Discord.Client();
 const token = 'MjgxOTI2OTY5MjYyODY2NDQy.C4ifmQ.CK45dWaoCIsPGYIANTufz1ee5DU';
+
+function randomNumber(maxNum){
+  return Math.floor(Math.random() * maxNum);
+}
+
+function rollDie(params){
+  var data = params.split(' ');
+  var numOfDice = data[0];
+  var typeOfDice = data[1];
+  var results = [];
+  for(var i = 0; i < numOfDice; i++){
+    results.push(randomNumber(typeOfDice) + 1);
+  }
+  return results;
+}
+
+function getDotaItemInfo(item){
+  var item_url = item.replace(/\s+/g, '-').toLowerCase();
+  var url = 'http://www.dotabuff.com/items/' + item_url + '/';
+  console.log(url);
+  request(url, function(error, response, html){
+    console.log(html);
+    if(!error){
+      var $ = cheerio.load(html);
+      var name, gold, description, icon;
+      $('.name').filter(function(){
+        var data = $(this);
+        name = data.children().first().text();
+        return name;
+      });
+    } else {
+      console.log(error);
+      return 'Didn\'t find any item by that name.';
+    }
+  }); 
+}
 
 //Utility functions
 function updateTime(){
@@ -41,6 +82,7 @@ function updateTime(){
 client.on('ready', () => {
   console.log('I am ready!');
 });
+
 
 // create an event listener for messages
 client.on('message', message => {
@@ -93,9 +135,20 @@ client.on('message', message => {
       }
     }
   } else if (message.content === '!commands-to-troll-jeremy') {
-      message.channel.sendMessage('__**!10-minutes**__ - <:10minutes:267176892954574848>\n' +
+    message.channel.sendMessage('__**!10-minutes**__ - <:10minutes:267176892954574848>\n' +
                                   '__**!time**__ - Start the Jeremy AFK timer. Ends the timer if it is currently active.\n' +
                                   '__**!check-time**__ - Check current Jeremy AFK timer.\n');
+  } else if (message.content.startsWith('!dota item ')) {
+    var param = message.content.replace('!dota item ', '');
+    var msg = getDotaItemInfo(param);
+    message.channel.sendMessage('Item Name: ' + msg);
+  } else if (message.content.startsWith('!roll ')) {
+    var param = message.content.replace('!roll ', '');
+    var results = rollDie(param);
+    var splitMsg = param.split(' ');
+    var numOfDice = splitMsg[0];
+    var typeOfDice = splitMsg[1];
+    message.channel.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results);
   }
 });
 
