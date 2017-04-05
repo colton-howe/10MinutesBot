@@ -38,8 +38,8 @@
     "AC": 14,
     "initiative": 3,
     "speed": 30,
-    "hp": 36,
-    "hit dice": ["5d8"],
+    "HP": 36,
+    "hitDice": "5d8",
     "languages": ["Common", "Infernal"],
     "spell stat": "CHA"
   }

@@ -49,50 +49,91 @@ function calculateStatMod(stat){
 function getCharacterSheet(charName, bot){
   var fileName = charName.toLowerCase() + '.json'; 
   var charInfo = [];
-  var contents = fs.readFileSync(fileName);
-  var json = JSON.parse(contents)[0];
-  charInfo.push('```');
-  charInfo.push('Name: ' + json.name);
-  var level = '';
-  for(var i = 0; i < json.class.length; i++){
-    level += json.class[i] + ' ' + json.level[i] + " ";
-  }
-  charInfo.push('Level: ' + level);
-  charInfo.push('Race: ' + json.race);
-  charInfo.push('Alignment: ' + json.alignment);
-  var proficiency = json.proficiency;
-  charInfo.push('Proficiency: ' + proficiency);
-  charInfo.push('       STR DEX CON INT WIS CHA')
-  var formattedStats = "";
-  var modifiers = "";
-  var stats = [];
-  var saves = "";
-  for(var stat in json.stats){
-    if (json.stats.hasOwnProperty(stat)) {
-      if(json.stats[stat].toString().length == 1){
-        formattedStats += json.stats[stat][0] + "   ";
-        modifiers += calculateStatMod(json.stats[stat][0]) + "  "; 
-      } else {
-        formattedStats += json.stats[stat][0] + "  ";
-        modifiers += calculateStatMod(json.stats[stat][0]) + "   "; 
-      }
-      stats.push(json.stats[stat][0]);
-      var save = calculateStatMod(json.stats[stat][0]); 
-      if(json.stats[stat][1]){
-        save += proficiency;
-      }
-      if(save < 0){
-        saves += save + "  ";
-      } else {
-        saves += save + "   ";
+  try {
+    var contents = fs.readFileSync(fileName);
+    var json = JSON.parse(contents)[0];
+    charInfo.push('```');
+    charInfo.push('Name: ' + json.name);
+    var level = '';
+    for(var i = 0; i < json.class.length; i++){
+      level += json.class[i] + ' ' + json.level[i] + " ";
+    }
+    charInfo.push('Level: ' + level);
+    charInfo.push('Race: ' + json.race);
+    charInfo.push('Alignment: ' + json.alignment);
+    charInfo.push('AC: ' + json.AC + '   HP: ' + json.HP + '   Hit Dice: ' + json.hitDice);
+    charInfo.push('Initiative: ' + json.initiative + '   Speed: ' + json.speed + 'ft');
+    var proficiency = json.proficiency;
+    charInfo.push('Proficiency: ' + proficiency);
+    charInfo.push('       STR DEX CON INT WIS CHA')
+    var formattedStats = "";
+    var modifiers = "";
+    var stats = [];
+    var saves = "";
+    for(var stat in json.stats){
+      if (json.stats.hasOwnProperty(stat)) {
+        if(json.stats[stat].toString().length == 1){
+          formattedStats += json.stats[stat][0] + "   ";
+          modifiers += calculateStatMod(json.stats[stat][0]) + "  "; 
+        } else {
+          formattedStats += json.stats[stat][0] + "  ";
+          modifiers += calculateStatMod(json.stats[stat][0]) + "   "; 
+        }
+        stats.push(json.stats[stat][0]);
+        var save = calculateStatMod(json.stats[stat][0]); 
+        if(json.stats[stat][1]){
+          save += proficiency;
+        }
+        if(save < 0){
+          saves += save + "  ";
+        } else {
+          saves += save + "   ";
+        }
       }
     }
+    charInfo.push('Stats: ' + formattedStats);
+    charInfo.push('Mods : ' + modifiers);
+    charInfo.push('Saves: ' + saves);
+    for(var skill in json.skills){
+      var statTotal = 0;
+      var statSpot = 0;
+      switch(json.skills[skill][0]){
+        case 'STR':
+          statSpot = 0;
+          break;
+        case 'DEX':
+          statSpot = 1;
+          break;
+        case 'CON':
+          statSpot = 2;
+          break;
+        case 'INT':
+          statSpot = 3;
+          break;
+        case 'WIS':
+          statSpot = 4;
+          break;
+        case 'CHA':
+          statSpot = 5;
+          break;
+      }
+      statTotal = calculateStatMod(stats[statSpot]);
+      if(json.skills[skill][1]){
+        statTotal += proficiency;
+      }
+      var statMsg = skill + ': ';
+      var statMsgLength = 17-statMsg.length;
+      for(var i = 0; i < statMsgLength; i++){
+        statMsg += ' ';
+      }
+      charInfo.push(statMsg + statTotal);
+    }
+    
+    charInfo.push('```');
+    bot.sendMessage(charInfo);  
+  } catch (err) {
+    bot.sendMessage('Character Sheet Not Found')
   }
-  charInfo.push('Stats: ' + formattedStats);
-  charInfo.push('Mods : ' + modifiers);
-  charInfo.push('Saves: ' + saves);
-  charInfo.push('```');
-  bot.sendMessage(charInfo);
 }
 
 function getSpellInfo(spell, bot){
