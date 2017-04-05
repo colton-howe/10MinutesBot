@@ -1,0 +1,46 @@
+[
+  { 
+    "name": "Narissa Evira",
+    "class": ["Bard"],
+    "level": [5],
+    "race": "Tiefling",
+    "alignment": "Chaotic Neutral",
+    "proficiency" : 3,
+    "stats": {
+      "STR": [11, false],
+      "DEX": [17, true],
+      "CON": [12, false],
+      "INT": [16, false],
+      "WIS": [14, false],
+      "CHA": [19, true]
+    },
+    "skills": {
+      "Acrobatics"      : ["DEX", false],
+      "Animal Handling" : ["WIS", false],
+      "Arcana"          : ["INT", false],
+      "Athletics"       : ["STR", false],
+      "Deception"       : ["CHA", true],
+      "History"         : ["INT", false],
+      "Insight"         : ["WIS", false],
+      "Intimidation"    : ["CHA", false],
+      "Investiation"    : ["INT", false],
+      "Medicine"        : ["WIS", false],
+      "Nature"          : ["INT", false],
+      "Perception"      : ["WIS", false],
+      "Performance"     : ["CHA", true],
+      "Persuasion"      : ["CHA", true],
+      "Religion"        : ["INT", false],
+      "Sleight of Hand" : ["DEX", true],
+      "Stealth"         : ["DEX", false],
+      "Survival"        : ["WIS", false]
+    },
+    
+    "AC": 14,
+    "initiative": 3,
+    "speed": 30,
+    "hp": 36,
+    "hit dice": ["5d8"],
+    "languages": ["Common", "Infernal"],
+    "spell stat": "CHA"
+  }
+]

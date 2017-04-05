@@ -1,12 +1,14 @@
 {
-  "name"        : "node-web-scrape",
+  "name"        : "Discord Bot",
   "version"     : "0.0.1",
-  "description" : "Scrape stuff on Web",
+  "description" : "Do Random Tasks for Discord Servers",
   "main"        : "bot.js",
   "author"      : "Colton Howe",
   "dependencies": {
     "express"   : "latest",
     "request"   : "latest",
-    "cheerio"   : "latest"
+    "cheerio"   : "latest",
+    "fs"        : "latest",
+    "discord.js": "latest"
   }
 }

@@ -42,12 +42,109 @@ function rollDie(params){
   return results;
 }
 
+function calculateStatMod(stat){
+  return Math.floor((stat - 10)/2);
+}
+
+function getCharacterSheet(charName, bot){
+  var fileName = charName.toLowerCase() + '.json'; 
+  var charInfo = [];
+  var contents = fs.readFileSync(fileName);
+  var json = JSON.parse(contents)[0];
+  charInfo.push('```');
+  charInfo.push('Name: ' + json.name);
+  var level = '';
+  for(var i = 0; i < json.class.length; i++){
+    level += json.class[i] + ' ' + json.level[i] + " ";
+  }
+  charInfo.push('Level: ' + level);
+  charInfo.push('Race: ' + json.race);
+  charInfo.push('Alignment: ' + json.alignment);
+  var proficiency = json.proficiency;
+  charInfo.push('Proficiency: ' + proficiency);
+  charInfo.push('       STR DEX CON INT WIS CHA')
+  var formattedStats = "";
+  var modifiers = "";
+  var stats = [];
+  var saves = "";
+  for(var stat in json.stats){
+    if (json.stats.hasOwnProperty(stat)) {
+      if(json.stats[stat].toString().length == 1){
+        formattedStats += json.stats[stat][0] + "   ";
+        modifiers += calculateStatMod(json.stats[stat][0]) + "  "; 
+      } else {
+        formattedStats += json.stats[stat][0] + "  ";
+        modifiers += calculateStatMod(json.stats[stat][0]) + "   "; 
+      }
+      stats.push(json.stats[stat][0]);
+      var save = calculateStatMod(json.stats[stat][0]); 
+      if(json.stats[stat][1]){
+        save += proficiency;
+      }
+      if(save < 0){
+        saves += save + "  ";
+      } else {
+        saves += save + "   ";
+      }
+    }
+  }
+  charInfo.push('Stats: ' + formattedStats);
+  charInfo.push('Mods : ' + modifiers);
+  charInfo.push('Saves: ' + saves);
+  charInfo.push('```');
+  bot.sendMessage(charInfo);
+}
+
+function getSpellInfo(spell, bot){
+  var spellUrl = spell.replace(/\s+/g, '-').toLowerCase();
+  spellUrl = spellUrl.replace('\'','-');
+  spellUrl = spellUrl.replace('/','-');
+  var name, school, casting_time, range, components, duration, description;
+  var url = 'http://www.5esrd.com/spellcasting/all-spells/' + spellUrl.charAt(0) + '/' + spellUrl + '/';
+  request(url, function(error, response, html){
+    if(!error){
+      var $ = cheerio.load(html);
+      var spell_info = [];
+      $("article[class^='spellcasting spellsa-z']").filter(function(){
+        var data = $(this);
+        name = data.children().eq(3).text();
+        spell_info.push("__**" + name + "**__");
+      });
+      $(".article-content").filter(function(){
+        var data = $(this);
+        school = data.children().eq(1).text();
+        spell_info.push("**" + school + "**");
+        var focusedData = data.children().eq(2);
+        var textInfo = focusedData.clone().children().remove().end().text();
+        var splitInfo = textInfo.split(': ');
+        casting_time = splitInfo[1];
+        spell_info.push("**Casting Time**: " + casting_time);
+        range = splitInfo[2];
+        spell_info.push("**Range**: " + range);
+        components = splitInfo[3];
+        spell_info.push("**Components**: " + components);  
+        duration = splitInfo[4];
+        spell_info.push("**Duration**: " + duration);
+        var length = data.children().length;
+        for(var i = 3; i < length-2; i++){
+          spell_info.push(data.children().eq(i).text());
+        }
+      });
+    } else {
+      console.log(error);
+      return 'Didn\'t find any spell by that name.';
+    }
+    if(spell_info.length == 0){
+      spell_info.push('Spell Not Found');
+    }
+    bot.sendMessage(spell_info);
+  }); 
+}
+
 function getDotaItemInfo(item){
   var item_url = item.replace(/\s+/g, '-').toLowerCase();
   var url = 'http://www.dotabuff.com/items/' + item_url + '/';
-  console.log(url);
   request(url, function(error, response, html){
-    console.log(html);
     if(!error){
       var $ = cheerio.load(html);
       var name, gold, description, icon;
@@ -114,9 +211,6 @@ client.on('message', message => {
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' +
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' +
                                 '<:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>    <:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>\n')
-  }  else if (message.content === '!bohan') {
-      sleep(1);
-      message.channel.sendMessage('Jeremy is lying. Its a conspiracy!');
   } else if (message.content === '!check-time') {
     if(timing == 0){
       message.channel.sendMessage('We aren\'t waiting on Jeremy...yet.');
@@ -136,8 +230,10 @@ client.on('message', message => {
     }
   } else if (message.content === '!commands-to-troll-jeremy') {
     message.channel.sendMessage('__**!10-minutes**__ - <:10minutes:267176892954574848>\n' +
-                                  '__**!time**__ - Start the Jeremy AFK timer. Ends the timer if it is currently active.\n' +
-                                  '__**!check-time**__ - Check current Jeremy AFK timer.\n');
+                                '__**!time**__ - Start the Jeremy AFK timer. Ends the timer if it is currently active.\n' +
+                                '__**!check-time**__ - Check current Jeremy AFK timer.\n' +
+                                '__**!roll X Y**__ - Generate X random numbers between 1 and Y\n' +
+                                '__**!spell X**__ - Look up a D&D 5E spell named X');
   } else if (message.content.startsWith('!dota item ')) {
     var param = message.content.replace('!dota item ', '');
     var msg = getDotaItemInfo(param);
@@ -149,6 +245,12 @@ client.on('message', message => {
     var numOfDice = splitMsg[0];
     var typeOfDice = splitMsg[1];
     message.channel.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results);
+  } else if (message.content.startsWith('!spell ')) {
+    var param = message.content.replace('!spell ', '');
+    var msg = getSpellInfo(param, message.channel);
+  } else if (message.content.startsWith('!sheet ')) {
+    var param = message.content.replace('!sheet ', '');
+    var msg = getCharacterSheet(param, message.channel);
   }
 });
 
