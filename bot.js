@@ -50,7 +50,7 @@ function getCharacterSheet(charName, bot){
   var fileName = charName.toLowerCase() + '.json'; 
   var charInfo = [];
   try {
-    var contents = fs.readFileSync(fileName);
+    var contents = fs.readFileSync('characters\\' + fileName);
     var json = JSON.parse(contents)[0];
     charInfo.push('```');
     charInfo.push('Name: ' + json.name);
