@@ -1,0 +1,46 @@
+[
+  { 
+    "name": "Whitman Kane",
+    "class": ["Artificer"],
+    "level": [5],
+    "race": "Human",
+    "alignment": "Chaotic Evil",
+    "proficiency" : 3,
+    "stats": {
+      "STR": [11, false],
+      "DEX": [14, false],
+      "CON": [14 , true],
+      "INT": [16, true],
+      "WIS": [11, false],
+      "CHA": [13, false]
+    },
+    "skills": {
+      "Acrobatics"      : ["DEX", false],
+      "Animal Handling" : ["WIS", false],
+      "Arcana"          : ["INT", true],
+      "Athletics"       : ["STR", true],
+      "Deception"       : ["CHA", true],
+      "History"         : ["INT", false],
+      "Insight"         : ["WIS", false],
+      "Intimidation"    : ["CHA", false],
+      "Investiation"    : ["INT", false],
+      "Medicine"        : ["WIS", false],
+      "Nature"          : ["INT", false],
+      "Perception"      : ["WIS", true],
+      "Performance"     : ["CHA", false],
+      "Persuasion"      : ["CHA", false],
+      "Religion"        : ["INT", false],
+      "Sleight of Hand" : ["DEX", true],
+      "Stealth"         : ["DEX", false],
+      "Survival"        : ["WIS", true]
+    },
+    
+    "AC": "14",
+    "initiative": 2,
+    "speed": 30,
+    "HP": 38,
+    "hitDice": "5d8",
+    "languages": ["Common", "Elvish", "Undercommon", "Orcish"],
+    "spell stat": "WIS"
+  }
+]

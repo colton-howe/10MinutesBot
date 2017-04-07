@@ -1,0 +1,46 @@
+  [
+  { 
+    "name": "The Slave Reaper",
+    "class": ["Ranger"],
+    "level": [5],
+    "race": "Wood Elf",
+    "alignment": "Neutral Evil",
+    "proficiency" : 3,
+    "stats": {
+      "STR": [11, true],
+      "DEX": [18, true],
+      "CON": [16, false],
+      "INT": [14, false],
+      "WIS": [14, false],
+      "CHA": [14, false]
+    },
+    "skills": {
+      "Acrobatics"      : ["DEX", true],
+      "Animal Handling" : ["WIS", false],
+      "Arcana"          : ["INT", false],
+      "Athletics"       : ["STR", false],
+      "Deception"       : ["CHA", false],
+      "History"         : ["INT", false],
+      "Insight"         : ["WIS", false],
+      "Intimidation"    : ["CHA", false],
+      "Investiation"    : ["INT", false],
+      "Medicine"        : ["WIS", false],
+      "Nature"          : ["INT", false],
+      "Perception"      : ["WIS", true],
+      "Performance"     : ["CHA", false],
+      "Persuasion"      : ["CHA", false],
+      "Religion"        : ["INT", false],
+      "Sleight of Hand" : ["DEX", true],
+      "Stealth"         : ["DEX", true],
+      "Survival"        : ["WIS", true]
+    },
+    
+    "AC": 16,
+    "initiative": 4,
+    "speed": 30,
+    "HP": 55,
+    "hitDice": "5d10",
+    "languages": ["Common", "Elvish", "Dwarvish", "Undercommon"],
+    "spell stat": "CHA"
+  }
+]

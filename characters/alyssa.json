@@ -1,0 +1,46 @@
+[
+  { 
+    "name": "Alyssa I-Dont-Have-A-Last-Name",
+    "class": ["Sorcerer"],
+    "level": [5],
+    "race": "Half-Elf",
+    "alignment": "Chaotic Evil",
+    "proficiency" : 3,
+    "stats": {
+      "STR": [8, false],
+      "DEX": [16, false],
+      "CON": [14 , true],
+      "INT": [11, false],
+      "WIS": [14, false],
+      "CHA": [19, true]
+    },
+    "skills": {
+      "Acrobatics"      : ["DEX", false],
+      "Animal Handling" : ["WIS", false],
+      "Arcana"          : ["INT", true],
+      "Athletics"       : ["STR", true],
+      "Deception"       : ["CHA", false],
+      "History"         : ["INT", false],
+      "Insight"         : ["WIS", true],
+      "Intimidation"    : ["CHA", true],
+      "Investiation"    : ["INT", false],
+      "Medicine"        : ["WIS", false],
+      "Nature"          : ["INT", false],
+      "Perception"      : ["WIS", true],
+      "Performance"     : ["CHA", false],
+      "Persuasion"      : ["CHA", false],
+      "Religion"        : ["INT", false],
+      "Sleight of Hand" : ["DEX", false],
+      "Stealth"         : ["DEX", false],
+      "Survival"        : ["WIS", true]
+    },
+    
+    "AC": "16",
+    "initiative": 3,
+    "speed": 30,
+    "HP": 36,
+    "hitDice": "5d6",
+    "languages": ["Common", "Elvish", "Draconian", "Dwarvish", "Sylvan"],
+    "spell stat": "CHA"
+  }
+] 

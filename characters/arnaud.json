@@ -1,0 +1,46 @@
+[
+  { 
+    "name": "Deep-Vicar Arnaud Hamund Vulk",
+    "class": ["Cleric"],
+    "level": [5],
+    "race": "Human",
+    "alignment": "Lawful Evil",
+    "proficiency" : 3,
+    "stats": {
+      "STR": [15, false],
+      "DEX": [5, false],
+      "CON": [15, false],
+      "INT": [12, false],
+      "WIS": [18, true],
+      "CHA": [11, true]
+    },
+    "skills": {
+      "Acrobatics"      : ["DEX", false],
+      "Animal Handling" : ["WIS", false],
+      "Arcana"          : ["INT", false],
+      "Athletics"       : ["STR", false],
+      "Deception"       : ["CHA", false],
+      "History"         : ["INT", false],
+      "Insight"         : ["WIS", true],
+      "Intimidation"    : ["CHA", false],
+      "Investiation"    : ["INT", false],
+      "Medicine"        : ["WIS", true],
+      "Nature"          : ["INT", false],
+      "Perception"      : ["WIS", false],
+      "Performance"     : ["CHA", false],
+      "Persuasion"      : ["CHA", true],
+      "Religion"        : ["INT", true],
+      "Sleight of Hand" : ["DEX", false],
+      "Stealth"         : ["DEX", false],
+      "Survival"        : ["WIS", false]
+    },
+    
+    "AC": "16/18",
+    "initiative": -3,
+    "speed": 30,
+    "HP": 32,
+    "hitDice": "5d8",
+    "languages": ["Common", "Elvish", "Undercommon", "Orcish"],
+    "spell stat": "WIS"
+  }
+]

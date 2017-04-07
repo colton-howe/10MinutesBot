@@ -31,19 +31,31 @@ function randomNumber(maxNum){
   return Math.floor(Math.random() * maxNum);
 }
 
-function rollDie(params){
+function rollDie(params, bot){
   var data = params.split(' ');
   var numOfDice = data[0];
   var typeOfDice = data[1];
   var results = [];
+  var total = 0;
   for(var i = 0; i < numOfDice; i++){
-    results.push(randomNumber(typeOfDice) + 1);
+    var randomNum = randomNumber(typeOfDice) + 1;
+    total += randomNum;
+    results.push(randomNum);
   }
-  return results;
+  bot.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results + "\nDice Total = " + total);
 }
 
 function calculateStatMod(stat){
   return Math.floor((stat - 10)/2);
+}
+
+function padSpacing(text, characterMax){
+  var output = '';
+  output += text;
+  for(var i = 0; i < characterMax-text.toString().length; i++){
+    output += ' ';
+  }
+  return output;
 }
 
 function getCharacterSheet(charName, bot){
@@ -67,35 +79,27 @@ function getCharacterSheet(charName, bot){
     charInfo.push('Proficiency: ' + proficiency);
     charInfo.push('       STR DEX CON INT WIS CHA')
     var formattedStats = "";
-    var modifiers = "";
     var stats = [];
     var saves = "";
+    var mods = "";
+    var statBlockLength = 4;
     for(var stat in json.stats){
       if (json.stats.hasOwnProperty(stat)) {
-        if(json.stats[stat].toString().length == 1){
-          formattedStats += json.stats[stat][0] + "   ";
-          modifiers += calculateStatMod(json.stats[stat][0]) + "  "; 
-        } else {
-          formattedStats += json.stats[stat][0] + "  ";
-          modifiers += calculateStatMod(json.stats[stat][0]) + "   "; 
-        }
+        formattedStats += padSpacing(json.stats[stat][0].toString(), statBlockLength);
+        mods += padSpacing(calculateStatMod(json.stats[stat][0]), statBlockLength);
         stats.push(json.stats[stat][0]);
         var save = calculateStatMod(json.stats[stat][0]); 
         if(json.stats[stat][1]){
           save += proficiency;
         }
-        if(save < 0){
-          saves += save + "  ";
-        } else {
-          saves += save + "   ";
-        }
+        saves += padSpacing(save, statBlockLength);
       }
     }
     charInfo.push('Stats: ' + formattedStats);
-    charInfo.push('Mods : ' + modifiers);
+    charInfo.push('Mods : ' + mods);
     charInfo.push('Saves: ' + saves);
     for(var skill in json.skills){
-      var statTotal = 0;
+      var skillTotal = 0;
       var statSpot = 0;
       switch(json.skills[skill][0]){
         case 'STR':
@@ -117,22 +121,21 @@ function getCharacterSheet(charName, bot){
           statSpot = 5;
           break;
       }
-      statTotal = calculateStatMod(stats[statSpot]);
+      skillTotal = calculateStatMod(stats[statSpot]);
       if(json.skills[skill][1]){
-        statTotal += proficiency;
+        skillTotal += proficiency;
       }
-      var statMsg = skill + ': ';
-      var statMsgLength = 17-statMsg.length;
-      for(var i = 0; i < statMsgLength; i++){
-        statMsg += ' ';
-      }
-      charInfo.push(statMsg + statTotal);
+      var skillMsg = skill + ': ';
+      var skillMsgLength = 17;
+      skillMsg = padSpacing(skillMsg, skillMsgLength);
+      charInfo.push(skillMsg + skillTotal);
     }
     
     charInfo.push('```');
     bot.sendMessage(charInfo);  
   } catch (err) {
     bot.sendMessage('Character Sheet Not Found')
+    console.log(err);
   }
 }
 
@@ -274,18 +277,15 @@ client.on('message', message => {
                                 '__**!time**__ - Start the Jeremy AFK timer. Ends the timer if it is currently active.\n' +
                                 '__**!check-time**__ - Check current Jeremy AFK timer.\n' +
                                 '__**!roll X Y**__ - Generate X random numbers between 1 and Y\n' +
-                                '__**!spell X**__ - Look up a D&D 5E spell named X');
+                                '__**!spell X**__ - Look up a D&D 5E spell named X\n' +
+                                '__**!sheet  X**__ - Display a D&D 5E character sheet for character named X');
   } else if (message.content.startsWith('!dota item ')) {
     var param = message.content.replace('!dota item ', '');
     var msg = getDotaItemInfo(param);
     message.channel.sendMessage('Item Name: ' + msg);
   } else if (message.content.startsWith('!roll ')) {
     var param = message.content.replace('!roll ', '');
-    var results = rollDie(param);
-    var splitMsg = param.split(' ');
-    var numOfDice = splitMsg[0];
-    var typeOfDice = splitMsg[1];
-    message.channel.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results);
+    var results = rollDie(param, message.channel);
   } else if (message.content.startsWith('!spell ')) {
     var param = message.content.replace('!spell ', '');
     var msg = getSpellInfo(param, message.channel);
