@@ -13,6 +13,7 @@ var request = require('request');
 var cheerio = require('cheerio');
 var app = express();
 
+//Variables to deal with the !time command
 var startTime;
 var endTime;
 var timing = 0;
@@ -22,42 +23,13 @@ var seconds = 0;
 var minutes = 0;
 var hours = 0;
 var days = 0;
+var timeUser;
 
 // create an instance of a Discord Client, and call it bot
 const client = new Discord.Client();
 const token = 'MjgxOTI2OTY5MjYyODY2NDQy.C4ifmQ.CK45dWaoCIsPGYIANTufz1ee5DU';
 
-function randomNumber(maxNum){
-  return Math.floor(Math.random() * maxNum);
-}
-
-function rollDie(params, bot){
-  var data = params.split(' ');
-  var numOfDice = data[0];
-  var typeOfDice = data[1];
-  var results = [];
-  var total = 0;
-  for(var i = 0; i < numOfDice; i++){
-    var randomNum = randomNumber(typeOfDice) + 1;
-    total += randomNum;
-    results.push(randomNum);
-  }
-  bot.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results + "\nDice Total = " + total);
-}
-
-function calculateStatMod(stat){
-  return Math.floor((stat - 10)/2);
-}
-
-function padSpacing(text, characterMax){
-  var output = '';
-  output += text;
-  for(var i = 0; i < characterMax-text.toString().length; i++){
-    output += ' ';
-  }
-  return output;
-}
-
+//D&D Functions
 function getCharacterSheet(charName, bot){
   var fileName = charName.toLowerCase() + '.json'; 
   var charInfo = [];
@@ -140,6 +112,10 @@ function getCharacterSheet(charName, bot){
 }
 
 function getSpellInfo(spell, bot){
+  //For the memes
+  if(spell.toLowerCase() === 'za warudo'){
+    spell = 'time stop';
+  }
   var spellUrl = spell.replace(/\s+/g, '-').toLowerCase();
   spellUrl = spellUrl.replace('\'','-');
   spellUrl = spellUrl.replace('/','-');
@@ -185,6 +161,11 @@ function getSpellInfo(spell, bot){
   }); 
 }
 
+function calculateStatMod(stat){
+  return Math.floor((stat - 10)/2);
+}
+
+//Dota 2 Functions
 function getDotaItemInfo(item){
   var item_url = item.replace(/\s+/g, '-').toLowerCase();
   var url = 'http://www.dotabuff.com/items/' + item_url + '/';
@@ -218,6 +199,78 @@ function updateTime(){
   days = Math.floor(x);
 }
 
+function padSpacing(text, characterMax){
+  var output = '';
+  output += text;
+  for(var i = 0; i < characterMax-text.toString().length; i++){
+    output += ' ';
+  }
+  return output;
+}
+
+function randomNumber(maxNum){
+  return Math.floor(Math.random() * maxNum);
+}
+
+function rollDie(params, bot){
+  var data = params.split(' ');
+  var numOfDice = data[0];
+  var typeOfDice = data[1];
+  var results = [];
+  var total = 0;
+  for(var i = 0; i < numOfDice; i++){
+    var randomNum = randomNumber(typeOfDice) + 1;
+    total += randomNum;
+    results.push(randomNum);
+  }
+  bot.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results + "\nDice Total = " + total);
+}
+
+//Jeremy commands
+function checkTime(bot){
+  if(timing == 0){
+    bot.sendMessage('We aren\'t waiting on Jeremy...yet.');
+  } else {
+    updateTime();
+    if (minutes == 0) {
+      bot.sendMessage('Jeremy has been AFK for ' + seconds + ' seconds');
+    } else if (hours == 0 && minutes < 10) {
+      bot.sendMessage('Jeremy has been AFK for ' + minutes + ' minutes and ' + seconds + ' seconds');
+    } else if (hours == 0 && minutes >= 10) {
+      bot.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
+    } else if (days == 0) {
+      bot.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
+    } else {
+      bot.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
+    }
+  }
+}
+
+function timeJeremy(message){
+  if(timing == 0){
+    message.channel.sendMessage('Starting Timer');
+    startTime = new Date();
+    timing = 1;
+    startUser = message.author.username;
+  } else {
+    updateTime();
+    if(seconds == 0) {
+      message.channel.sendMessage("Stop spamming, Jeremy would never actually be back this fast.");
+    } else if (minutes == 0) {
+      message.channel.sendMessage('Jeremy was AFK for ' + seconds + ' seconds');
+    } else if (hours == 0 && minutes < 10) {
+      message.channel.sendMessage('Jeremy was AFK for ' + minutes + ' minutes and ' + seconds + ' seconds');
+    } else if (hours == 0 && minutes >= 10) {
+      message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy was AFK for ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
+    } else if (days == 0) {
+      message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy was AFK for ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
+    } else {
+      message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy was AFK for ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
+    }
+    timing = 0;
+  }
+}
+
 // the ready event is vital, it means that your bot will only start reacting to information
 // from Discord _after_ ready is emitted.
 client.on('ready', () => {
@@ -228,27 +281,7 @@ client.on('ready', () => {
 // create an event listener for messages
 client.on('message', message => {
   if (message.content === '!time') {
-    if(timing == 0){
-      message.channel.sendMessage('Starting Timer');
-      startTime = new Date();
-      timing = 1;
-    } else {
-      updateTime();
-      if(seconds == 0) {
-        message.channel.sendMessage("Stop spamming, Jeremy would never actually be back this fast.");
-      } else if (minutes == 0) {
-        message.channel.sendMessage('Jeremy was AFK for ' + seconds + ' seconds');
-      } else if (hours == 0 && minutes < 10) {
-        message.channel.sendMessage('Jeremy was AFK for ' + minutes + ' minutes and ' + seconds + ' seconds');
-      } else if (hours == 0 && minutes >= 10) {
-        message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy was AFK for ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
-      } else if (days == 0) {
-        message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy was AFK for ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
-      } else {
-        message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy was AFK for ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
-      }
-      timing = 0;
-    }
+    timeJeremy(message);
   } else if (message.content === '!10-minutes') {
     message.channel.sendMessage('<:10minutes:267176892954574848> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>\n' +
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' + 
@@ -256,26 +289,14 @@ client.on('message', message => {
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' +
                                 '<:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>    <:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>\n')
   } else if (message.content === '!check-time') {
-    if(timing == 0){
-      message.channel.sendMessage('We aren\'t waiting on Jeremy...yet.');
-    } else {
-      updateTime();
-      if (minutes == 0) {
-        message.channel.sendMessage('Jeremy has been AFK for ' + seconds + ' seconds');
-      } else if (hours == 0 && minutes < 10) {
-        message.channel.sendMessage('Jeremy has been AFK for ' + minutes + ' minutes and ' + seconds + ' seconds');
-      } else if (hours == 0 && minutes >= 10) {
-        message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
-      } else if (days == 0) {
-        message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
-      } else {
-        message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
-      }
-    }
-  } else if (message.content === '!commands-to-troll-jeremy') {
+    checkTime(message.channel);
+  } else if (message.content === '!time-starter') {
+    message.channel.sendMessage('Last timer started by ' + timeUser);
+  } else if (message.content === '!commands') {
     message.channel.sendMessage('__**!10-minutes**__ - <:10minutes:267176892954574848>\n' +
                                 '__**!time**__ - Start the Jeremy AFK timer. Ends the timer if it is currently active.\n' +
                                 '__**!check-time**__ - Check current Jeremy AFK timer.\n' +
+                                '__**!time-starter**__ - Displays name of the last person to start the timer\n' +
                                 '__**!roll X Y**__ - Generate X random numbers between 1 and Y\n' +
                                 '__**!spell X**__ - Look up a D&D 5E spell named X\n' +
                                 '__**!sheet  X**__ - Display a D&D 5E character sheet for character named X');

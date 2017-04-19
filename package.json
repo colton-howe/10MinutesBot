@@ -1,14 +1,14 @@
 {
-  "name"        : "Discord Bot",
-  "version"     : "0.0.1",
-  "description" : "Do Random Tasks for Discord Servers",
-  "main"        : "bot.js",
-  "author"      : "Colton Howe",
+  "name": "Discord-Bot",
+  "version": "0.0.1",
+  "description": "Do Random Tasks for Discord Servers",
+  "main": "bot.js",
+  "author": "Colton Howe",
   "dependencies": {
-    "express"   : "latest",
-    "request"   : "latest",
-    "cheerio"   : "latest",
-    "fs"        : "latest",
-    "discord.js": "latest"
+    "cheerio": "latest",
+    "discord.js": "latest",
+    "express": "latest",
+    "fs": "latest",
+    "request": "latest"
   }
 }
