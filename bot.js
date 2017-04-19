@@ -23,7 +23,7 @@ var seconds = 0;
 var minutes = 0;
 var hours = 0;
 var days = 0;
-var timeUser;
+var startUser;
 
 // create an instance of a Discord Client, and call it bot
 const client = new Discord.Client();
@@ -291,7 +291,7 @@ client.on('message', message => {
   } else if (message.content === '!check-time') {
     checkTime(message.channel);
   } else if (message.content === '!time-starter') {
-    message.channel.sendMessage('Last timer started by ' + timeUser);
+    message.channel.sendMessage('Last timer started by ' + startUser);
   } else if (message.content === '!commands') {
     message.channel.sendMessage('__**!10-minutes**__ - <:10minutes:267176892954574848>\n' +
                                 '__**!time**__ - Start the Jeremy AFK timer. Ends the timer if it is currently active.\n' +
