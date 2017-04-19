@@ -8,6 +8,7 @@
     "cheerio": "latest",
     "discord.js": "latest",
     "express": "latest",
+    "forever": "latest",
     "fs": "latest",
     "request": "latest"
   }
