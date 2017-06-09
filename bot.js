@@ -25,7 +25,6 @@ var hours = 0;
 var days = 0;
 var userTimed = false;
 var startUser;
-var userTimed;
 
 // create an instance of a Discord Client, and call it bot
 const client = new Discord.Client();
