@@ -40,7 +40,7 @@ function getCharacterSheet(charName, bot){
     charInfo.push('Name: ' + json.name);
     var level = '';
     for(var i = 0; i < json.class.length; i++){
-      level += json.class[i] + ' ' + json.level[i] + " ";
+      level += json.class[i] + ' ' + json.level[i] + ' ';
     }
     charInfo.push('Level: ' + level);
     charInfo.push('Race: ' + json.race);
@@ -50,10 +50,10 @@ function getCharacterSheet(charName, bot){
     var proficiency = json.proficiency;
     charInfo.push('Proficiency: ' + proficiency);
     charInfo.push('       STR DEX CON INT WIS CHA')
-    var formattedStats = "";
+    var formattedStats = '';
     var stats = [];
-    var saves = "";
-    var mods = "";
+    var saves = '';
+    var mods = '';
     var statBlockLength = 4;
     for(var stat in json.stats){
       if (json.stats.hasOwnProperty(stat)) {
@@ -133,18 +133,18 @@ function getSpellInfo(spell, bot){
       $(".article-content").filter(function(){
         var data = $(this);
         school = data.children().eq(1).text();
-        spell_info.push("**" + school + "**");
+        spell_info.push('**' + school + '**');
         var focusedData = data.children().eq(2);
         var textInfo = focusedData.clone().children().remove().end().text();
         var splitInfo = textInfo.split(': ');
         casting_time = splitInfo[1];
-        spell_info.push("**Casting Time**: " + casting_time);
+        spell_info.push('**Casting Time**: ' + casting_time);
         range = splitInfo[2];
-        spell_info.push("**Range**: " + range);
+        spell_info.push('**Range**: ' + range);
         components = splitInfo[3];
-        spell_info.push("**Components**: " + components);  
+        spell_info.push('**Components**: ' + components);  
         duration = splitInfo[4];
-        spell_info.push("**Duration**: " + duration);
+        spell_info.push('**Duration**: ' + duration);
         var length = data.children().length;
         for(var i = 3; i < length-2; i++){
           spell_info.push(data.children().eq(i).text());
@@ -223,7 +223,7 @@ function rollDie(params, bot){
     total += randomNum;
     results.push(randomNum);
   }
-  bot.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results + "\nDice Total = " + total);
+  bot.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results + '\nDice Total = ' + total);
 }
 
 //Jeremy commands
@@ -255,7 +255,7 @@ function timeJeremy(message){
   } else {
     updateTime();
     if(seconds == 0) {
-      message.channel.sendMessage("Stop spamming, Jeremy would never actually be back this fast.");
+      message.channel.sendMessage('Stop spamming, Jeremy would never actually be back this fast.');
     } else if (minutes == 0) {
       message.channel.sendMessage('Jeremy was AFK for ' + seconds + ' seconds');
     } else if (hours == 0 && minutes < 10) {
