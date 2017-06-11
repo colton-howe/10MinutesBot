@@ -28,7 +28,7 @@ var startUser;
 
 // create an instance of a Discord Client, and call it bot
 const client = new Discord.Client();
-const token = 'MjgxOTI2OTY5MjYyODY2NDQy.C4ifmQ.CK45dWaoCIsPGYIANTufz1ee5DU';
+const token = fs.readFileSync('key.txt', 'utf8');
 
 //D&D Functions
 function getCharacterSheet(charName, bot){
