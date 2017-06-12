@@ -1,8 +1,8 @@
 /*
   Author: Colton Howe
-  Version: 0.1
+  Version: 0.5
   Date: Feb 16th, 2017
-  Description: Initial implementation of Timing Bot
+  Description: Working on optimization
 */
 
 // import the discord.js module
@@ -16,20 +16,24 @@ var app = express();
 //Variables to deal with the !time command
 var startTime;
 var endTime;
-var timing = 0;
-var startTime = 0;
-var endTime = 0;
-var seconds = 0;
-var minutes = 0;
-var hours = 0;
 var days = 0;
-var userTimed;
-var userTimerRunning = false;
 var startUser;
+var allTimedUsers = [];
 
 // create an instance of a Discord Client, and call it bot
 const client = new Discord.Client();
 const token = fs.readFileSync('key.txt', 'utf8');
+
+//Classes
+function timedUser(username) {
+  this.name = username;
+  this.startTime;
+  this.endTime;
+  this.seconds;
+  this.minutes;
+  this.hours;
+  this.days;
+}
 
 //D&D Functions
 function getCharacterSheet(charName, bot){
@@ -188,17 +192,17 @@ function getDotaItemInfo(item){
 }
 
 //Utility functions
-function updateTime(){
-  endTime = new Date();
-  var timeAFK = endTime.getTime()-startTime.getTime();
+function updateTime(user){
+  user.endTime = new Date();
+  var timeAFK = user.endTime.getTime()-user.startTime.getTime();
   var x = timeAFK / 1000
-  seconds = Math.floor(x % 60);
+  user.seconds = Math.floor(x % 60);
   x /= 60
-  minutes = Math.floor(x % 60);
+  user.minutes = Math.floor(x % 60);
   x /= 60
-  hours = Math.floor(x % 24);
+  user.hours = Math.floor(x % 24);
   x /= 24
-  days = Math.floor(x);
+  user.days = Math.floor(x);
 }
 
 function padSpacing(text, characterMax){
@@ -228,12 +232,16 @@ function rollDie(params, bot){
   bot.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results + '\nDice Total = ' + total);
 }
 
+//Bohan Pang
+
+//REDO all of these
 //Jeremy commands
 function checkTime(bot){
+  var userTimed = message.mentions.users.first();
   if(timing == 0){
     bot.sendMessage('We aren\'t waiting on Jeremy...yet.');
   } else {
-    updateTime();
+    updateTime(user);
     if (minutes == 0) {
       bot.sendMessage('Jeremy has been AFK for ' + seconds + ' seconds');
     } else if (hours == 0 && minutes < 10) {
@@ -248,57 +256,56 @@ function checkTime(bot){
   }
 }
 
-function timeJeremy(message){
-  if(timing == 0){
-    message.channel.sendMessage('Starting Timer');
-    startTime = new Date();
-    timing = 1;
-    startUser = message.author.username;
-  } else {
-    updateTime();
-    if(seconds == 0) {
-      message.channel.sendMessage('Stop spamming, Jeremy would never actually be back this fast.');
-    } else if (minutes == 0) {
-      message.channel.sendMessage('Jeremy was AFK for ' + seconds + ' seconds');
-    } else if (hours == 0 && minutes < 10) {
-      message.channel.sendMessage('Jeremy was AFK for ' + minutes + ' minutes and ' + seconds + ' seconds');
-    } else if (hours == 0 && minutes >= 10) {
-      message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy was AFK for ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
-    } else if (days == 0) {
-      message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy was AFK for ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
-    } else {
-      message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy was AFK for ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
-    }
-    timing = 0;
-  }
-}
-
 function timeUser(message){
+  var userTimerRunning = false;
+  var foundUser;
+  var userTimed = message.mentions.users.first();
 
-  if(timing == 0){
-    userTimed = message.mentions.users.first();
-    message.channel.sendMessage('Starting Timer for' + userTimed);
-    startTime = new Date();
-    timing = 1;
-    userTimerRunning = true;
-    startUser = message.author.username;
-  } else if(userTimerRunning == true) {
-    updateTime();
-    if(seconds == 0) {
-      message.channel.sendMessage("Stop spamming," + userTimed + " would never actually be back this fast.");
-    } else if (minutes == 0) {
-      message.channel.sendMessage(userTimed + ' was AFK for ' + seconds + ' seconds');
-    } else if (hours == 0 && minutes < 10) {
-      message.channel.sendMessage(userTimed + ' was AFK for ' + minutes + ' minutes and ' + seconds + ' seconds');
-    } else if (hours == 0 && minutes >= 10) {
-      message.channel.sendMessage('<:10minutes:267176892954574848> ' + userTimed + ' was AFK for ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
-    } else if (days == 0) {
-      message.channel.sendMessage('<:10minutes:267176892954574848> ' + userTimed + ' was AFK for ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
-    } else {
-      message.channel.sendMessage('<:10minutes:267176892954574848> ' + userTimed + ' was AFK for ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
+  //If function wasn't passed a user, display error and exit
+  if(userTimed == undefined){
+    message.channel.sendMessage("Please declare a user after !time.");
+    return -1;
+  }
+
+  //Check if the user is already being timed
+  for(var i = 0; i < allTimedUsers.length; i++){
+    if(allTimedUsers[i].name === userTimed.username) {
+      userTimerRunning = true;
+      foundUser = allTimedUsers[i];
     }
-    timing = 0;
-    userTimerRunning = false;
+  }
+
+  /*If user is not being timed, add to list of people being timed. If being timed, stop their timer and display time,
+   *then remove from list of timed users.
+   */
+  if(userTimerRunning == false){
+    message.channel.sendMessage('Starting Timer for ' + userTimed);
+    var user = new timedUser(userTimed.username);
+    user.startTime = new Date();
+    startUser = message.author.username;
+    allTimedUsers.push(user);
+  } else if(userTimerRunning == true) {
+    updateTime(foundUser);
+    if(foundUser.seconds == 0) {
+      message.channel.sendMessage("Stop spamming," + foundUser.name + " would never actually be back this fast.");
+    } else if (foundUser.minutes == 0) {
+      message.channel.sendMessage(foundUser.name + ' was AFK for ' + foundUser.seconds + ' seconds');
+    } else if (foundUser.hours == 0 && foundUser.minutes < 10) {
+      message.channel.sendMessage(foundUser.name + ' was AFK for ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds');
+    } else if (foundUser.hours == 0 && foundUser.minutes >= 10) {
+      message.channel.sendMessage('<:10minutes:267176892954574848> ' + foundUser.name + ' was AFK for ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds <:10minutes:267176892954574848>');
+    } else if (foundUser.days == 0) {
+      message.channel.sendMessage('<:10minutes:267176892954574848> ' + foundUser.name + ' was AFK for ' + foundUser.hours + ' hours, ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds <:10minutes:267176892954574848>');
+    } else {
+      message.channel.sendMessage('<:10minutes:267176892954574848> ' + foundUser.name + ' was AFK for ' + foundUser.days + ' days, ' + foundUser.hours + ' hours, ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds <:10minutes:267176892954574848>');
+    }
+    //Splice out the user we just finished the timer for
+    for(var i = 0; i < allTimedUsers.length; i++){
+      if(foundUser.name === allTimedUsers[i].name){
+        allTimedUsers.splice(i, 1);
+      }
+      break;
+    }
   }
   else {
     message.channel.sendMessage(userTimed + " is not being timed right now");
@@ -314,17 +321,15 @@ client.on('ready', () => {
 
 // create an event listener for messages
 client.on('message', message => {
-  if (message.content === '!time' && userTimerRunning == false) {
-    timeJeremy(message);
-  } else if (message.content === '!10-minutes') {
+  if (message.content === '!10-minutes') {
     message.channel.sendMessage('<:10minutes:267176892954574848> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>\n' +
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' + 
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' +
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' +
                                 '<:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>    <:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>\n')
-  } else if (message.content === '!check-time') {
-    checkTime(message.channel);
-  } else if (message.content.startsWith("!time")) {
+  } else if (message.content.startsWith('!check-time')) {
+    checkTime(message);
+  } else if (message.content.startsWith('!time')) {
     timeUser(message);
   } else if (message.content === '!time-starter') {
     message.channel.sendMessage('Last timer started by ' + startUser);
