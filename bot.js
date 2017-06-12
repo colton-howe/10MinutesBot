@@ -282,6 +282,7 @@ function checkTime(message){
 
 function timeUser(message){
   var userTimerRunning = false;
+  var foundUser;
   var userTimed = message.mentions.users.first();
 
   //If function wasn't passed a user, display error and exit
