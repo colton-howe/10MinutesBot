@@ -24,6 +24,7 @@ var minutes = 0;
 var hours = 0;
 var days = 0;
 var userTimed = false;
+var userTimerRunning = false;
 var startUser;
 
 // create an instance of a Discord Client, and call it bot
@@ -279,9 +280,9 @@ function timeUser(message){
     message.channel.sendMessage('Starting Timer for' + userTimed);
     startTime = new Date();
     timing = 1;
-    userTimer = true;
+    userTimerRunning = true;
     startUser = message.author.username;
-  } else if(userTimer == true) {
+  } else if(userTimerRunning == true) {
     updateTime();
     if(seconds == 0) {
       message.channel.sendMessage("Stop spamming," + userTimed + " would never actually be back this fast.");
@@ -297,7 +298,7 @@ function timeUser(message){
       message.channel.sendMessage('<:10minutes:267176892954574848> ' + userTimed + ' was AFK for ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
     }
     timing = 0;
-    userTimer = false;
+    userTimerRunning = false;
   }
   else {
     message.channel.sendMessage(userTimed + " is not being timed right now");
@@ -313,7 +314,7 @@ client.on('ready', () => {
 
 // create an event listener for messages
 client.on('message', message => {
-  if (message.content === '!time' && userTimer == false) {
+  if (message.content === '!time' && userTimerRunning == false) {
     timeJeremy(message);
   } else if (message.content === '!10-minutes') {
     message.channel.sendMessage('<:10minutes:267176892954574848> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>\n' +
