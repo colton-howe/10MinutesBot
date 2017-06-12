@@ -23,7 +23,7 @@ var seconds = 0;
 var minutes = 0;
 var hours = 0;
 var days = 0;
-var userTimed = false;
+var userTimed;
 var userTimerRunning = false;
 var startUser;
 
