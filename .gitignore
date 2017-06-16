@@ -218,3 +218,5 @@ pip-log.txt
 .mr.developer.cfg
 
 key.txt
+*.jshintrc
+launch_bat.bat
