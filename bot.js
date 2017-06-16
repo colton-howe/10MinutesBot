@@ -236,23 +236,47 @@ function rollDie(params, bot){
 
 //REDO all of these
 //Jeremy commands
-function checkTime(bot){
+function checkTime(message){
+  //variable for the user in the message
   var userTimed = message.mentions.users.first();
-  if(timing == 0){
-    bot.sendMessage('We aren\'t waiting on Jeremy...yet.');
-  } else {
-    updateTime(user);
-    if (minutes == 0) {
-      bot.sendMessage('Jeremy has been AFK for ' + seconds + ' seconds');
-    } else if (hours == 0 && minutes < 10) {
-      bot.sendMessage('Jeremy has been AFK for ' + minutes + ' minutes and ' + seconds + ' seconds');
-    } else if (hours == 0 && minutes >= 10) {
-      bot.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
-    } else if (days == 0) {
-      bot.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
-    } else {
-      bot.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes and ' + seconds + ' seconds <:10minutes:267176892954574848>');
+  //variable for when he is found in array of users being timed
+  var foundUser;
+
+  //if the message does not contain a user
+  if(userTimed == undefined){
+    message.channel.sendMessage("Please declare a user after !time.");
+  } 
+
+  else {
+    //check all timed users for the named user
+    for(var i = 0; i < allTimedUsers.length; i++) {
+      //if the named user is timed, save him for use in the function
+      if(allTimedUsers[i].name === userTimed.username) {
+        foundUser = allTimedUsers[i];
+      }
     }
+    //if that user is not found
+    if(foundUser == undefined) {
+      message.channel.sendMessage("User is not being timed yet.");
+    }
+
+    //otherwise print the user's time
+    else {
+      updateTime(foundUser);
+      if (foundUser.seconds == 0) {
+        message.channel.sendMessage('Stop spamming ' + foundUser.seconds + ' would never be back that fast');
+      } else if (foundUser.minutes == 0) {
+        message.channel.sendMessage(foundUser.name + ' has been AFK for ' + foundUser.seconds + ' seconds');
+      } else if (foundUser.hours == 0 && foundUser.minutes < 10) {
+        message.channel.sendMessage('Jeremy has been AFK for ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds');
+      } else if (foundUser.hours == 0 && foundUser.minutes >= 10) {
+        message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds <:10minutes:267176892954574848>');
+      } else if (foundUser.days == 0) {
+        message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + foundUser.hours + ' hours, ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds <:10minutes:267176892954574848>');
+      } else {
+        message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + foundUser.days + ' days, ' + foundUser.hours + ' hours, ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds <:10minutes:267176892954574848>');
+      }
+    } 
   }
 }
 
