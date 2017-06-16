@@ -14,9 +14,6 @@ var cheerio = require('cheerio');
 var app = express();
 
 //Variables to deal with the !time command
-var startTime;
-var endTime;
-var days = 0;
 var startUser;
 var allTimedUsers = [];
 
@@ -27,12 +24,12 @@ const token = fs.readFileSync('key.txt', 'utf8');
 //Classes
 function timedUser(username) {
   this.name = username;
-  this.startTime;
-  this.endTime;
-  this.seconds;
-  this.minutes;
-  this.hours;
-  this.days;
+  this.startTime = 0;
+  this.endTime = 0;
+  this.seconds = 0;
+  this.minutes = 0;
+  this.hours = 0;
+  this.days = 0;
 }
 
 //D&D Functions
@@ -55,7 +52,7 @@ function getCharacterSheet(charName, bot){
     charInfo.push('Initiative: ' + json.initiative + '   Speed: ' + json.speed + 'ft');
     var proficiency = json.proficiency;
     charInfo.push('Proficiency: ' + proficiency);
-    charInfo.push('       STR DEX CON INT WIS CHA')
+    charInfo.push('       STR DEX CON INT WIS CHA');
     var formattedStats = '';
     var stats = [];
     var saves = '';
@@ -112,7 +109,7 @@ function getCharacterSheet(charName, bot){
     charInfo.push('```');
     bot.sendMessage(charInfo);  
   } catch (err) {
-    bot.sendMessage('Character Sheet Not Found')
+    bot.sendMessage('Character Sheet Not Found');
     console.log(err);
   }
 }
@@ -128,9 +125,9 @@ function getSpellInfo(spell, bot){
   var name, school, casting_time, range, components, duration, description;
   var url = 'http://www.5esrd.com/spellcasting/all-spells/' + spellUrl.charAt(0) + '/' + spellUrl + '/';
   request(url, function(error, response, html){
+  var spell_info = [];
     if(!error){
       var $ = cheerio.load(html);
-      var spell_info = [];
       $("article[class^='spellcasting spellsa-z']").filter(function(){
         var data = $(this);
         name = data.children().eq(3).text();
@@ -160,7 +157,7 @@ function getSpellInfo(spell, bot){
       console.log(error);
       return 'Didn\'t find any spell by that name.';
     }
-    if(spell_info.length == 0){
+    if(spell_info.length === 0){
       spell_info.push('Spell Not Found');
     }
     bot.sendMessage(spell_info);
@@ -195,13 +192,13 @@ function getDotaItemInfo(item){
 function updateTime(user){
   user.endTime = new Date();
   var timeAFK = user.endTime.getTime()-user.startTime.getTime();
-  var x = timeAFK / 1000
+  var x = timeAFK / 1000;
   user.seconds = Math.floor(x % 60);
-  x /= 60
+  x /= 60;
   user.minutes = Math.floor(x % 60);
-  x /= 60
+  x /= 60;
   user.hours = Math.floor(x % 24);
-  x /= 24
+  x /= 24;
   user.days = Math.floor(x);
 }
 
@@ -286,7 +283,7 @@ function timeUser(message){
   var userTimed = message.mentions.users.first();
 
   //If function wasn't passed a user, display error and exit
-  if(userTimed == undefined){
+  if(userTimed === undefined){
     message.channel.sendMessage("Please declare a user after !time.");
     return -1;
   }
@@ -302,31 +299,31 @@ function timeUser(message){
   /*If user is not being timed, add to list of people being timed. If being timed, stop their timer and display time,
    *then remove from list of timed users.
    */
-  if(userTimerRunning == false){
+  if(userTimerRunning === false){
     message.channel.sendMessage('Starting Timer for ' + userTimed);
     var user = new timedUser(userTimed.username);
     user.startTime = new Date();
     startUser = message.author.username;
     allTimedUsers.push(user);
-  } else if(userTimerRunning == true) {
+  } else if(userTimerRunning === true) {
     updateTime(foundUser);
-    if(foundUser.seconds == 0) {
+    if(foundUser.seconds === 0) {
       message.channel.sendMessage("Stop spamming," + foundUser.name + " would never actually be back this fast.");
-    } else if (foundUser.minutes == 0) {
+    } else if (foundUser.minutes === 0) {
       message.channel.sendMessage(foundUser.name + ' was AFK for ' + foundUser.seconds + ' seconds');
-    } else if (foundUser.hours == 0 && foundUser.minutes < 10) {
+    } else if (foundUser.hours === 0 && foundUser.minutes < 10) {
       message.channel.sendMessage(foundUser.name + ' was AFK for ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds');
-    } else if (foundUser.hours == 0 && foundUser.minutes >= 10) {
+    } else if (foundUser.hours === 0 && foundUser.minutes >= 10) {
       message.channel.sendMessage('<:10minutes:267176892954574848> ' + foundUser.name + ' was AFK for ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds <:10minutes:267176892954574848>');
-    } else if (foundUser.days == 0) {
+    } else if (foundUser.days === 0) {
       message.channel.sendMessage('<:10minutes:267176892954574848> ' + foundUser.name + ' was AFK for ' + foundUser.hours + ' hours, ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds <:10minutes:267176892954574848>');
     } else {
       message.channel.sendMessage('<:10minutes:267176892954574848> ' + foundUser.name + ' was AFK for ' + foundUser.days + ' days, ' + foundUser.hours + ' hours, ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds <:10minutes:267176892954574848>');
     }
     //Splice out the user we just finished the timer for
-    for(var i = 0; i < allTimedUsers.length; i++){
-      if(foundUser.name === allTimedUsers[i].name){
-        allTimedUsers.splice(i, 1);
+    for(var k = 0; k < allTimedUsers.length; k++){
+      if(foundUser.name === allTimedUsers[k].name){
+        allTimedUsers.splice(k, 1);
       }
       break;
     }
@@ -350,7 +347,7 @@ client.on('message', message => {
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' + 
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' +
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' +
-                                '<:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>    <:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>\n')
+                                '<:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>    <:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>\n');
   } else if (message.content.startsWith('!check-time')) {
     checkTime(message);
   } else if (message.content.startsWith('!time')) {
@@ -370,14 +367,14 @@ client.on('message', message => {
     var msg = getDotaItemInfo(param);
     message.channel.sendMessage('Item Name: ' + msg);
   } else if (message.content.startsWith('!roll ')) {
-    var param = message.content.replace('!roll ', '');
+    let param = message.content.replace('!roll ', '');
     var results = rollDie(param, message.channel);
   } else if (message.content.startsWith('!spell ')) {
-    var param = message.content.replace('!spell ', '');
-    var msg = getSpellInfo(param, message.channel);
+    let param = message.content.replace('!spell ', '');
+    let msg = getSpellInfo(param, message.channel);
   } else if (message.content.startsWith('!sheet ')) {
-    var param = message.content.replace('!sheet ', '');
-    var msg = getCharacterSheet(param, message.channel);
+   let param = message.content.replace('!sheet ', '');
+    let msg = getCharacterSheet(param, message.channel);
   }
 });
 
