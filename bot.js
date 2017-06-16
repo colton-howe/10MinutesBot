@@ -243,7 +243,7 @@ function checkTime(message){
   var foundUser;
 
   //if the message does not contain a user
-  if(userTimed == undefined){
+  if(userTimed === undefined){
     message.channel.sendMessage("Please declare a user after !time.");
   } 
 
@@ -256,22 +256,22 @@ function checkTime(message){
       }
     }
     //if that user is not found
-    if(foundUser == undefined) {
+    if(foundUser === undefined) {
       message.channel.sendMessage("User is not being timed yet.");
     }
 
     //otherwise print the user's time
     else {
       updateTime(foundUser);
-      if (foundUser.seconds == 0) {
+      if (foundUser.seconds === 0) {
         message.channel.sendMessage('Stop spamming ' + foundUser.seconds + ' would never be back that fast');
-      } else if (foundUser.minutes == 0) {
+      } else if (foundUser.minutes === 0) {
         message.channel.sendMessage(foundUser.name + ' has been AFK for ' + foundUser.seconds + ' seconds');
-      } else if (foundUser.hours == 0 && foundUser.minutes < 10) {
+      } else if (foundUser.hours === 0 && foundUser.minutes < 10) {
         message.channel.sendMessage('Jeremy has been AFK for ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds');
-      } else if (foundUser.hours == 0 && foundUser.minutes >= 10) {
+      } else if (foundUser.hours === 0 && foundUser.minutes >= 10) {
         message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds <:10minutes:267176892954574848>');
-      } else if (foundUser.days == 0) {
+      } else if (foundUser.days === 0) {
         message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + foundUser.hours + ' hours, ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds <:10minutes:267176892954574848>');
       } else {
         message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + foundUser.days + ' days, ' + foundUser.hours + ' hours, ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds <:10minutes:267176892954574848>');
