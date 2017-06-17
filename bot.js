@@ -24,6 +24,7 @@ const token = fs.readFileSync('key.txt', 'utf8');
 //Classes
 function timedUser(username) {
   this.name = username;
+  this.startUser = 0;
   this.startTime = 0;
   this.endTime = 0;
   this.seconds = 0;
@@ -241,7 +242,7 @@ function checkTime(message){
 
   //if the message does not contain a user
   if(userTimed === undefined){
-    message.channel.sendMessage("Please declare a user after !time.");
+    message.channel.sendMessage("Please declare a user after !check-time.");
   } 
 
   else {
@@ -303,7 +304,7 @@ function timeUser(message){
     message.channel.sendMessage('Starting Timer for ' + userTimed);
     var user = new timedUser(userTimed.username);
     user.startTime = new Date();
-    startUser = message.author.username;
+    user.startUser = message.author.username;
     allTimedUsers.push(user);
   } else if(userTimerRunning === true) {
     updateTime(foundUser);
@@ -333,6 +334,36 @@ function timeUser(message){
   }
 }
 
+function checkStarter(message)
+{
+  //variable for the user in the message
+  var userTimed = message.mentions.users.first();
+  //variable for when he is found in array of users being timed
+  var foundUser;
+
+  //if the message does not contain a user
+  if(userTimed === undefined){
+    message.channel.sendMessage("Please declare a user after !time-starter.");
+  }
+
+  else {
+    //check all timed users for the named user
+    for(var i = 0; i < allTimedUsers.length; i++) {
+      //if the named user is timed, save him for use in the function
+      if(allTimedUsers[i].name === userTimed.username) {
+        foundUser = allTimedUsers[i];
+    }
+  }
+  //if user is not being timed
+  if(foundUser === undefined) {
+    message.channel.sendMessage(userTimed + " is not being timed right now");
+  } else {
+    //print the user who started this timer
+     message.channel.sendMessage("Timer for " + userTimed.username + " was started by: " + foundUser.startUser);
+  }
+}
+}
+
 // the ready event is vital, it means that your bot will only start reacting to information
 // from Discord _after_ ready is emitted.
 client.on('ready', () => {
@@ -350,10 +381,10 @@ client.on('message', message => {
                                 '<:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>    <:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>\n');
   } else if (message.content.startsWith('!check-time')) {
     checkTime(message);
+  } else if (message.content.startsWith('!time-starter')) {
+    checkStarter(message);
   } else if (message.content.startsWith('!time')) {
     timeUser(message);
-  } else if (message.content === '!time-starter') {
-    message.channel.sendMessage('Last timer started by ' + startUser);
   } else if (message.content === '!commands') {
     message.channel.sendMessage('__**!10-minutes**__ - <:10minutes:267176892954574848>\n' +
                                 '__**!time**__ - Start the Jeremy AFK timer. Ends the timer if it is currently active.\n' +
