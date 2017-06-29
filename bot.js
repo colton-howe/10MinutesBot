@@ -1,7 +1,7 @@
 /*
   Author: Colton Howe
   Version: 0.5
-  Date: Feb 16th, 2017
+  Date: June 28th, 2017
   Description: Working on optimization
 */
 
@@ -229,9 +229,6 @@ function rollDie(params, bot){
   bot.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results + '\nDice Total = ' + total);
 }
 
-//Bohan Pang
-
-//REDO all of these
 //Jeremy commands
 function checkTime(message){
   //variable for the user in the message
@@ -356,8 +353,8 @@ client.on('message', message => {
     message.channel.sendMessage('Last timer started by ' + startUser);
   } else if (message.content === '!commands') {
     message.channel.sendMessage('__**!10-minutes**__ - <:10minutes:267176892954574848>\n' +
-                                '__**!time**__ - Start the Jeremy AFK timer. Ends the timer if it is currently active.\n' +
-                                '__**!check-time**__ - Check current Jeremy AFK timer.\n' +
+                                '__**!time X**__ - Start the AFK timer for X, where X is a username in the channel. Ends the timer for X username if it is currently active.\n' +
+                                '__**!check-time X**__ - Check current AFK timer of X, where X is a username that is being timed.\n' +
                                 '__**!time-starter**__ - Displays name of the last person to start the timer\n' +
                                 '__**!roll X Y**__ - Generate X random numbers between 1 and Y\n' +
                                 '__**!spell X**__ - Look up a D&D 5E spell named X\n' +
