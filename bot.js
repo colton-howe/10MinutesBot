@@ -321,8 +321,8 @@ function timeUser(message){
     for(var k = 0; k < allTimedUsers.length; k++){
       if(foundUser.name === allTimedUsers[k].name){
         allTimedUsers.splice(k, 1);
+        break;
       }
-      break;
     }
   }
   else {
