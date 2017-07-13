@@ -169,6 +169,7 @@ function calculateStatMod(stat){
 }
 
 //Dota 2 Functions
+//TODO: Seems to be something wrong with DotaBuff's item page, keep getting errors on page request. Will have to look into the scraping method.
 function getDotaItemInfo(item){
   var item_url = item.replace(/\s+/g, '-').toLowerCase();
   var url = 'http://www.dotabuff.com/items/' + item_url + '/';
@@ -233,15 +234,13 @@ function rollDie(params, bot){
 function checkTime(message){
   //variable for the user in the message
   var userTimed = message.mentions.users.first();
-  //variable for when he is found in array of users being timed
+  //variable for when the user is found in array of users being timed
   var foundUser;
 
   //if the message does not contain a user
   if(userTimed === undefined){
     message.channel.sendMessage("Please declare a user after !time.");
-  } 
-
-  else {
+  } else {
     //check all timed users for the named user
     for(var i = 0; i < allTimedUsers.length; i++) {
       //if the named user is timed, save him for use in the function
@@ -319,7 +318,7 @@ function timeUser(message){
     }
     //Splice out the user we just finished the timer for
     for(var k = 0; k < allTimedUsers.length; k++){
-      if(foundUser.name === allTimedUsers[k].name){
+      if(foundUser.name == allTimedUsers[k].name){
         allTimedUsers.splice(k, 1);
         break;
       }
@@ -339,19 +338,19 @@ client.on('ready', () => {
 
 // create an event listener for messages
 client.on('message', message => {
-  if (message.content === '!10-minutes') {
+  if (message.content.toLowerCase() === '!10-minutes') {
     message.channel.sendMessage('<:10minutes:267176892954574848> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>\n' +
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' + 
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' +
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' +
                                 '<:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>    <:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>\n');
-  } else if (message.content.startsWith('!check-time')) {
+  } else if (message.content.toLowerCase().startsWith('!check-time')) {
     checkTime(message);
-  } else if (message.content.startsWith('!time')) {
+  } else if (message.content.toLowerCase().startsWith('!time')) {
     timeUser(message);
-  } else if (message.content === '!time-starter') {
+  } else if (message.content.toLowerCase() === '!time-starter') {
     message.channel.sendMessage('Last timer started by ' + startUser);
-  } else if (message.content === '!commands') {
+  } else if (message.content.toLowerCase() === '!commands') {
     message.channel.sendMessage('__**!10-minutes**__ - <:10minutes:267176892954574848>\n' +
                                 '__**!time X**__ - Start the AFK timer for X, where X is a username in the channel. Ends the timer for X username if it is currently active.\n' +
                                 '__**!check-time X**__ - Check current AFK timer of X, where X is a username that is being timed.\n' +
@@ -359,18 +358,18 @@ client.on('message', message => {
                                 '__**!roll X Y**__ - Generate X random numbers between 1 and Y\n' +
                                 '__**!spell X**__ - Look up a D&D 5E spell named X\n' +
                                 '__**!sheet  X**__ - Display a D&D 5E character sheet for character named X');
-  } else if (message.content.startsWith('!dota item ')) {
+  } else if (message.content.toLowerCase().startsWith('!dota item ')) {
     var param = message.content.replace('!dota item ', '');
     var msg = getDotaItemInfo(param);
     message.channel.sendMessage('Item Name: ' + msg);
-  } else if (message.content.startsWith('!roll ')) {
-    let param = message.content.replace('!roll ', '');
+  } else if (message.content.toLowerCase().startsWith('!roll ')) {
+    let param = message.content.toLowerCase().replace('!roll ', '');
     var results = rollDie(param, message.channel);
-  } else if (message.content.startsWith('!spell ')) {
-    let param = message.content.replace('!spell ', '');
+  } else if (message.content.toLowerCase().startsWith('!spell ')) {
+    let param = message.content.toLowerCase().replace('!spell ', '');
     let msg = getSpellInfo(param, message.channel);
-  } else if (message.content.startsWith('!sheet ')) {
-   let param = message.content.replace('!sheet ', '');
+  } else if (message.content.toLowerCase().startsWith('!sheet ')) {
+   let param = message.content.toLowerCase().replace('!sheet ', '');
     let msg = getCharacterSheet(param, message.channel);
   }
 });
