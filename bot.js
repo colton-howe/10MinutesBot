@@ -363,10 +363,10 @@ client.on('message', message => {
     message.channel.sendMessage('Last timer started by ' + startUser);
   } else if (message.content.toLowerCase() === '!commands') {
     message.channel.sendMessage('__**!10-minutes**__ - <:10minutes:267176892954574848>\n' +
-                                '__**!time X**__ - Start the AFK timer for X, where X is a username in the channel. Ends the timer for X username if it is currently active.\n' +
-                                '__**!check-time X**__ - Check current AFK timer of X, where X is a username that is being timed.\n' +
+                                '__**!time X**__ - Start the AFK timer for X, where X is a username in the channel. Ends the timer for X username if it is currently active\n' +
+                                '__**!check-time X**__ - Check current AFK timer of X, where X is a username that is being timed\n' +
                                 '__**!time-starter**__ - Displays name of the last person to start the timer\n' +
-                                '__**!roll X Y**__ - Generate X random numbers between 1 and Y\n' +
+                                '__**!roll XdY**__ - Generate X random numbers between 1 and Y. An optional modifier can be added to the end\n' +
                                 '__**!spell X**__ - Look up a D&D 5E spell named X\n' +
                                 '__**!sheet  X**__ - Display a D&D 5E character sheet for character named X');
   } else if (message.content.toLowerCase().startsWith('!dota item ')) {
