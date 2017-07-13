@@ -216,18 +216,30 @@ function randomNumber(maxNum){
   return Math.floor(Math.random() * maxNum);
 }
 
-function rollDie(params, bot){
-  var data = params.split(' ');
-  var numOfDice = data[0];
-  var typeOfDice = data[1];
-  var results = [];
-  var total = 0;
-  for(var i = 0; i < numOfDice; i++){
-    var randomNum = randomNumber(typeOfDice) + 1;
-    total += randomNum;
-    results.push(randomNum);
+function rollDie(requestedDice, bot){
+  var dicePattern = /([\d]+)d([\d]+)([\s]?([+-])[\s]?([\d]+))?$/;
+  var matches = dicePattern.exec(requestedDice);
+  if(matches != null){
+    var numOfDice = matches[1];
+    var typeOfDice = matches[2];
+    var operation = matches[4];
+    var modifier = parseInt(matches[5]);
+    var results = [];
+    var total = 0;
+    for(var i = 0; i < numOfDice; i++){
+      var randomNum = randomNumber(typeOfDice) + 1;
+      total += randomNum;
+      results.push(randomNum);
+    }
+    if (modifier){
+      var modifiedTotal = (operation == '+' ? total + modifier : total - modifier);
+      bot.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results + '\Roll Total: ' + total + ' ' + operation + ' ' + modifier + ' = ' + modifiedTotal);
+    } else {
+      bot.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results + '\Roll Total: ' + total);
+    }
+  } else {
+    bot.sendMessage('Invalid dice format. Example format: 1d20 + 5');
   }
-  bot.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results + '\nDice Total = ' + total);
 }
 
 //Jeremy commands
@@ -329,8 +341,7 @@ function timeUser(message){
   }
 }
 
-// the ready event is vital, it means that your bot will only start reacting to information
-// from Discord _after_ ready is emitted.
+// This is when the bot starts actually retrieving information from Discord.
 client.on('ready', () => {
   console.log('I am ready!');
 });
