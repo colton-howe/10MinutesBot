@@ -233,9 +233,9 @@ function rollDie(requestedDice, bot){
     }
     if (modifier){
       var modifiedTotal = (operation == '+' ? total + modifier : total - modifier);
-      bot.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results + '\Roll Total: ' + total + ' ' + operation + ' ' + modifier + ' = ' + modifiedTotal);
+      bot.sendMessage('Results for ' + numOfDice + 'd' + typeOfDice + ': ' + results + '\nRoll Total: ' + total + ' ' + operation + ' ' + modifier + ' = ' + modifiedTotal);
     } else {
-      bot.sendMessage('Results for ' + numOfDice + ' d' + typeOfDice + ': ' + results + '\Roll Total: ' + total);
+      bot.sendMessage('Results for ' + numOfDice + 'd' + typeOfDice + ': ' + results + '\nRoll Total: ' + total);
     }
   } else {
     bot.sendMessage('Invalid dice format. Example format: 1d20 + 5');
