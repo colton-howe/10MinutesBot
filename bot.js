@@ -371,6 +371,8 @@ client.on('message', message => {
   } else if (message.content.toLowerCase().startsWith('!sheet ')) {
    let param = message.content.toLowerCase().replace('!sheet ', '');
     let msg = getCharacterSheet(param, message.channel);
+  } else if (message.content.toLowerCase().startsWith('!')) {
+    message.channel.sendMessage('Invalid Command. Type !commands for list of commands.')
   }
 });
 
