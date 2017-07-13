@@ -217,7 +217,7 @@ function randomNumber(maxNum){
 }
 
 function rollDie(requestedDice, bot){
-  var dicePattern = /([\d]+)d([\d]+)([\s]?([+-])[\s]?([\d]+))?$/;
+  var dicePattern = /^([\d]+)d([\d]+)([\s]?([+-])[\s]?([\d]+))?$/;
   var matches = dicePattern.exec(requestedDice);
   if(matches != null){
     var numOfDice = matches[1];
