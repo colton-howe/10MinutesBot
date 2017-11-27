@@ -17,11 +17,14 @@ var app = express();
 var startUser;
 var allTimedUsers = [];
 
+var users = [];
+
 // create an instance of a Discord Client, and call it bot
 const client = new Discord.Client();
 const token = fs.readFileSync('key.txt', 'utf8');
 
 //Classes
+//TODO: Rework timedUser to use the User class
 function timedUser(username) {
   this.name = username;
   this.startTime = 0;
@@ -30,6 +33,21 @@ function timedUser(username) {
   this.minutes = 0;
   this.hours = 0;
   this.days = 0;
+}
+
+function User(user) {
+  this.id = user.id;
+  this.username = user.username;
+  this.points = 500;
+}
+
+function Player(userID){
+  this.user = UserID;
+}
+
+//Blackjack Functions
+function blackjackGame(){
+  
 }
 
 //D&D Functions
@@ -288,7 +306,7 @@ function checkTime(message){
 function timeUser(message){
   var userTimerRunning = false;
   var foundUser;
-  var userTimed = message.mentions.users.first();
+  var userTimed = message.mentions.users.first(); 
 
   //If function wasn't passed a user, display error and exit
   if(userTimed === undefined){
@@ -384,6 +402,8 @@ client.on('message', message => {
     let msg = getCharacterSheet(param, message.channel);
   } else if (message.content.toLowerCase() == '!nodota') {
     message.channel.sendMessage('Cant, Im at work preparing for my first day of work tomorrow');
+  } else if (message.content.toLowerCase() === '!blackjack') {
+    let msg = blackjackGame(message.channel);
   }
 });
 
