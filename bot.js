@@ -17,8 +17,6 @@ var app = express();
 var startUser;
 var allTimedUsers = [];
 
-var users = [];
-
 // create an instance of a Discord Client, and call it bot
 const client = new Discord.Client();
 const token = fs.readFileSync('key.txt', 'utf8');
@@ -41,13 +39,54 @@ function User(user) {
   this.points = 500;
 }
 
-function Player(userID){
-  this.user = UserID;
+
+function Game(id, name, minBid, maxBid){
+  this.id = id;
+  this.name = name;
+  this.minBid = minBid;
+  this.maxBid = maxBid;
+  this.players = [];
 }
 
+var blackjackGames = [
+  new Game(0, 'Normal Table', 10, 50),
+  new Game(1, 'High Roller Table', 50, 250)
+];
+
+var MAX_ROOM_NUMBER = 1000;
+var users = [];
+
 //Blackjack Functions
-function blackjackGame(){
-  
+function blackjackGame(param, message){
+  for(let i = 0; i < users.length; i++){
+    if(users[i].id === message.author.id){
+      users.push(new User(message.author))
+    }
+  }
+  if(param === '') {
+    message.channel.sendMessage('A room is required to play. Type "normal" to join the Normal room, and type "high" to join the High Roller room.');
+  } else if (param === 'normal'){
+    if(blackjackGames[0].players.includes(message.author)){
+      message.channel.sendMessage(message.author + ' has gotten up from the Normal table.');
+    } else {
+      message.channel.sendMessage(message.author + ' has sat down at the Normal table. Type !start-round to start a round.');
+    }
+  } else if (param === 'high'){
+    if(blackjackGames[1].players.includes(message.author)){
+      message.channel.sendMessage(message.author + ' has gotten up from the High Roller table.');
+    } else {
+      blackjackGames[1].players.push(message.author);
+      message.channel.sendMessage(message.author + ' has sat down at the High Roller table. Type !start-round to start a round.');
+    }
+  }
+}
+
+function startRound(message){
+  if(blackjackGames[0].players.includes(message.author)){
+    message.channel.sendMessage(message.author + ' has initiated the start of a round. You have 60 seconds to join the table before the round starts.');
+  } else if (blackjackGames[0].players.includes(message.author)){
+
+  }
 }
 
 //D&D Functions
@@ -398,12 +437,15 @@ client.on('message', message => {
     let param = message.content.toLowerCase().replace('!spell ', '');
     let msg = getSpellInfo(param, message.channel);
   } else if (message.content.toLowerCase().startsWith('!sheet ')) {
-   let param = message.content.toLowerCase().replace('!sheet ', '');
+    let param = message.content.toLowerCase().replace('!sheet ', '');
     let msg = getCharacterSheet(param, message.channel);
   } else if (message.content.toLowerCase() == '!nodota') {
     message.channel.sendMessage('Cant, Im at work preparing for my first day of work tomorrow');
-  } else if (message.content.toLowerCase() === '!blackjack') {
-    let msg = blackjackGame(message.channel);
+  } else if (message.content.toLowerCase().startsWith('!blackjack ')) {
+    let param = message.content.toLowerCase().replace('!blackjack ', '');
+    blackjackGame(params, message);
+  }else if (message.content.toLowerCase() === '!start-round') {
+    startRound(message);
   }
 });
 
