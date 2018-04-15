@@ -16,7 +16,8 @@ var app = express();
 //Variables to deal with the !time command
 var startUser;
 var allTimedUsers = [];
-const musicChannelID = 322809201359585280;
+const musicChannelID = 228658142718853121;
+const testChannelID = 322809201359585280;
 // create an instance of a Discord Client, and call it bot
 const client = new Discord.Client();
 const token = fs.readFileSync('key.txt', 'utf8');
