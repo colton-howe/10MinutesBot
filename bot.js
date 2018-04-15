@@ -16,7 +16,7 @@ var app = express();
 //Variables to deal with the !time command
 var startUser;
 var allTimedUsers = [];
-const musicChannelID = 228658142718853121;
+const musicChannelID = 322809201359585280;
 // create an instance of a Discord Client, and call it bot
 const client = new Discord.Client();
 const token = fs.readFileSync('key.txt', 'utf8');
@@ -418,7 +418,6 @@ function YouTubeGetID(url){
     return ID;
 }
 
-
 function createPlaylist(message) {
   //separates numeric argument from command
   var args = message.content.slice(1).trim().split(/ +/g);
@@ -454,8 +453,6 @@ function createPlaylist(message) {
           if(YouTubeGetID(messageContent).length == 11)
           {
             videoIDs.push(YouTubeGetID(messageContent));
-            var videoID = YouTubeGetID(messageContent);
-            console.log(videoID);
             songCount++;
           }
         }
@@ -478,7 +475,6 @@ function createPlaylist(message) {
   else {
     message.channel.sendMessage('Invalid Song Number, 1-20');
   }
-
 }
 
 // This is when the bot starts actually retrieving information from Discord.
