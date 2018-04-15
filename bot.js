@@ -16,7 +16,7 @@ var app = express();
 //Variables to deal with the !time command
 var startUser;
 var allTimedUsers = [];
-
+const musicChannelID = 322809201359585280;
 // create an instance of a Discord Client, and call it bot
 const client = new Discord.Client();
 const token = fs.readFileSync('key.txt', 'utf8');
@@ -91,7 +91,7 @@ function startRound(message){
 
 //D&D Functions
 function getCharacterSheet(charName, bot){
-  var fileName = charName.toLowerCase() + '.json'; 
+  var fileName = charName.toLowerCase() + '.json';
   var charInfo = [];
   try {
     var contents = fs.readFileSync('characters\\' + fileName);
@@ -120,7 +120,7 @@ function getCharacterSheet(charName, bot){
         formattedStats += padSpacing(json.stats[stat][0].toString(), statBlockLength);
         mods += padSpacing(calculateStatMod(json.stats[stat][0]), statBlockLength);
         stats.push(json.stats[stat][0]);
-        var save = calculateStatMod(json.stats[stat][0]); 
+        var save = calculateStatMod(json.stats[stat][0]);
         if(json.stats[stat][1]){
           save += proficiency;
         }
@@ -162,9 +162,9 @@ function getCharacterSheet(charName, bot){
       skillMsg = padSpacing(skillMsg, skillMsgLength);
       charInfo.push(skillMsg + skillTotal);
     }
-    
+
     charInfo.push('```');
-    bot.sendMessage(charInfo);  
+    bot.sendMessage(charInfo);
   } catch (err) {
     bot.sendMessage('Character Sheet Not Found');
     console.log(err);
@@ -202,7 +202,7 @@ function getSpellInfo(spell, bot){
         range = splitInfo[2];
         spell_info.push('**Range**: ' + range);
         components = splitInfo[3];
-        spell_info.push('**Components**: ' + components);  
+        spell_info.push('**Components**: ' + components);
         duration = splitInfo[4];
         spell_info.push('**Duration**: ' + duration);
         var length = data.children().length;
@@ -218,7 +218,7 @@ function getSpellInfo(spell, bot){
       spell_info.push('Spell Not Found');
     }
     bot.sendMessage(spell_info);
-  }); 
+  });
 }
 
 function calculateStatMod(stat){
@@ -243,7 +243,7 @@ function getDotaItemInfo(item){
       console.log(error);
       return 'Didn\'t find any item by that name.';
     }
-  }); 
+  });
 }
 
 //Utility functions
@@ -338,14 +338,14 @@ function checkTime(message){
       } else {
         message.channel.sendMessage('<:10minutes:267176892954574848> Jeremy has been AFK for ' + foundUser.days + ' days, ' + foundUser.hours + ' hours, ' + foundUser.minutes + ' minutes and ' + foundUser.seconds + ' seconds <:10minutes:267176892954574848>');
       }
-    } 
+    }
   }
 }
 
 function timeUser(message){
   var userTimerRunning = false;
   var foundUser;
-  var userTimed = message.mentions.users.first(); 
+  var userTimed = message.mentions.users.first();
 
   //If function wasn't passed a user, display error and exit
   if(userTimed === undefined){
@@ -398,6 +398,89 @@ function timeUser(message){
   }
 }
 
+/**
+* Get YouTube ID from various YouTube URL
+* @author: takien
+* @url: http://takien.com
+* For PHP YouTube parser, go here http://takien.com/864
+*/
+
+function YouTubeGetID(url){
+  var ID = '';
+  url = url.replace(/(>|<)/gi,'').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+  if(url[2] !== undefined) {
+    ID = url[2].split(/[^0-9a-z_\-]/i);
+    ID = ID[0];
+  }
+  else {
+    ID = url;
+  }
+    return ID;
+}
+
+
+function createPlaylist(message) {
+  //separates numeric argument from command
+  var args = message.content.slice(1).trim().split(/ +/g);
+  var command = args.shift().toLowerCase();
+  var numSongs = args[0];
+
+  //array to store list of video IDS
+  var videoIDs = [];
+
+  //if arg for number of IDs is valid
+  if(numSongs <= 20 && !isNaN(numSongs) && numSongs >= 0) {  // Get messages
+
+    //stores last 100 messages
+    message.channel.fetchMessages({ limit: 100 })
+      .then(messages => {
+        //converts them to an array for iteration
+      var messageArray = messages.array();
+
+      //counts the number of songs added to createPlaylist
+      var songCount = 0;
+      //for each message stored
+      for(var i = 0; i < messageArray.length; i++) {
+        //store the message content
+        var messageContent = messageArray[i].content;
+        //if requested number of songs has been met, break
+        if(songCount >= numSongs) {
+          break;
+        }
+        //otherwise, check if valid youtube link
+        if(messageContent.includes("https://www.youtube.com") || messageContent.includes("https://www.youtu.be") ||
+           messageContent.includes("https://youtu.be") || messageContent.includes("https://youtube.com")) {
+          //if it is, add ID to list of IDs
+          if(YouTubeGetID(messageContent).length == 11)
+          {
+            videoIDs.push(YouTubeGetID(messageContent));
+            var videoID = YouTubeGetID(messageContent);
+            console.log(videoID);
+            songCount++;
+          }
+        }
+      }
+      //reverse list of IDs
+      videoIDs.reverse();
+      //append them all to youtube link to produce playlist link
+      var urlOutput = 'http://www.youtube.com/watch_videos?video_ids=';
+      for(var i = 0; i < videoIDs.length; i++) {
+        urlOutput += videoIDs[i];
+        urlOutput += ",";
+      }
+      //remove trailing comma
+      urlOutput = urlOutput.slice(0, -1);
+      //print it to channel
+      message.channel.sendMessage("Here's your playlist: " + urlOutput);
+      })
+      .catch(console.error);
+  }
+  else {
+    message.channel.sendMessage('Invalid Song Number, 1-20');
+  }
+
+}
+
 // This is when the bot starts actually retrieving information from Discord.
 client.on('ready', () => {
   console.log('I am ready!');
@@ -408,7 +491,7 @@ client.on('ready', () => {
 client.on('message', message => {
   if (message.content.toLowerCase() === '!10-minutes') {
     message.channel.sendMessage('<:10minutes:267176892954574848> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>\n' +
-                                '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' + 
+                                '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' +
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' +
                                 '<:BohanW:284775760277798922> <:10minutes:267176892954574848> <:BohanW:284775760277798922>    <:10minutes:267176892954574848> <:BohanW:284775760277798922> <:10minutes:267176892954574848>\n' +
                                 '<:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>    <:10minutes:267176892954574848> <:10minutes:267176892954574848> <:10minutes:267176892954574848>\n');
@@ -425,6 +508,7 @@ client.on('message', message => {
                                 '__**!time-starter**__ - Displays name of the last person to start the timer\n' +
                                 '__**!roll XdY**__ - Generate X random numbers between 1 and Y. An optional modifier can be added to the end\n' +
                                 '__**!spell X**__ - Look up a D&D 5E spell named X\n' +
+                                '__**!playlist X**__ - Creates a playlist of the last X youtube videos\n' +
                                 '__**!sheet  X**__ - Display a D&D 5E character sheet for character named X');
   } else if (message.content.toLowerCase().startsWith('!dota item ')) {
     var param = message.content.replace('!dota item ', '');
@@ -446,6 +530,15 @@ client.on('message', message => {
     blackjackGame(params, message);
   }else if (message.content.toLowerCase() === '!start-round') {
     startRound(message);
+  }else if (message.content.toLowerCase().startsWith('!playlist ')) {
+    if(message.channel.id == musicChannelID) {
+      createPlaylist(message);
+    } else {
+      message.channel.sendMessage('This command can only be used in the music channel.');
+    }
+
+
+      //createPlaylist(message);
   }
 });
 
