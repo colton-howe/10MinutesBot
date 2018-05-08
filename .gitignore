@@ -218,5 +218,6 @@ pip-log.txt
 .mr.developer.cfg
 
 key.txt
+bitly.txt
 *.jshintrc
 launch_bat.bat

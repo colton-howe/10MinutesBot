@@ -21,6 +21,7 @@ const testChannelID = 322809201359585280;
 // create an instance of a Discord Client, and call it bot
 const client = new Discord.Client();
 const token = fs.readFileSync('key.txt', 'utf8');
+const bitlyToken = fs.readFileSync('bitly.txt', 'utf8');
 
 //Classes
 //TODO: Rework timedUser to use the User class
@@ -468,8 +469,14 @@ function createPlaylist(message) {
       }
       //remove trailing comma
       urlOutput = urlOutput.slice(0, -1);
-      //print it to channel
-      message.channel.sendMessage("Here's your playlist: " + urlOutput);
+      
+      //send the url to bitly for shortening
+      request("https://api-ssl.bitly.com/v3/shorten?access_token=" + bitlyToken + "&longUrl=" + urlOutput, function(error, response, html)
+    {
+      //parse the json and retrieve shortened url from it
+      jsonObject = JSON.parse(html);
+      message.channel.sendMessage("Here's your playlist: " + jsonObject.data.url);
+    });
       })
       .catch(console.error);
   }
@@ -528,7 +535,7 @@ client.on('message', message => {
   }else if (message.content.toLowerCase() === '!start-round') {
     startRound(message);
   }else if (message.content.toLowerCase().startsWith('!playlist ')) {
-    if(message.channel.id == musicChannelID) {
+    if(message.channel.id == testChannelID) {
       createPlaylist(message);
     } else {
       message.channel.sendMessage('This command can only be used in the music channel.');
