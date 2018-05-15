@@ -535,7 +535,7 @@ client.on('message', message => {
   }else if (message.content.toLowerCase() === '!start-round') {
     startRound(message);
   }else if (message.content.toLowerCase().startsWith('!playlist ')) {
-    if(message.channel.id == testChannelID) {
+    if(message.channel.id == musicChannelID) {
       createPlaylist(message);
     } else {
       message.channel.sendMessage('This command can only be used in the music channel.');
