@@ -221,3 +221,5 @@ key.txt
 bitly.txt
 *.jshintrc
 launch_bat.bat
+src/*.js
+src/commands/*.js
